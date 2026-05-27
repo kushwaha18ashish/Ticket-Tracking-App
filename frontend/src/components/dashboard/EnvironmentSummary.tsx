@@ -1,10 +1,6 @@
 import { useMemo } from 'react';
 import type { Environment, Ticket } from '@/types';
 import { ENVIRONMENT_LABELS, ENVIRONMENTS } from '@/lib/constants';
-import {
-  countTicketsByEnvironment,
-  getTotalFromEnvironmentCounts,
-} from '@/lib/environmentCounts';
 import { Card } from '@/components/ui/Card';
 
 interface EnvironmentSummaryProps {
@@ -60,11 +56,19 @@ export function EnvironmentSummary({
   tickets = [],
   loading,
 }: EnvironmentSummaryProps) {
-  const counts = useMemo(
-    () => countTicketsByEnvironment(tickets),
-    [tickets]
-  );
-  const total = useMemo(() => getTotalFromEnvironmentCounts(counts), [counts]);
+  const envStats = useMemo(() => {
+    return Object.fromEntries(
+      ENVIRONMENTS.map((env) => {
+        const envTickets = tickets.filter((t) => t.currentEnvironment === env);
+        const totalCount = envTickets.length;
+        const passedCount = envTickets.filter((t) => t.statuses[env] === 'PASS').length;
+        const pct = totalCount > 0 ? Math.round((passedCount / totalCount) * 100) : 0;
+        return [env, { totalCount, passedCount, pct }];
+      })
+    ) as Record<Environment, { totalCount: number; passedCount: number; pct: number }>;
+  }, [tickets]);
+
+  const total = tickets.length;
 
   return (
     <Card
@@ -78,10 +82,10 @@ export function EnvironmentSummary({
 
       <ul className="space-y-3">
         {ENVIRONMENTS.map((env) => {
-          const count = counts[env];
-          const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+          const { totalCount, passedCount, pct } = envStats[env];
           const style = ENV_STYLES[env];
           const isProduction = env === 'PRODUCTION';
+          const ticketLabel = totalCount === 1 ? 'ticket' : 'tickets';
 
           return (
             <li
@@ -108,12 +112,12 @@ export function EnvironmentSummary({
                     >
                       {ENVIRONMENT_LABELS[env]}
                     </p>
-                    {total > 0 && (
-                      <p className="text-xs text-slate-400">{pct}% of tickets</p>
-                    )}
+                    <p className="text-xs text-slate-400">
+                      {loading ? 'Loading...' : `${passedCount} out of ${totalCount} ${ticketLabel} passed`}
+                    </p>
                   </div>
                 </div>
-                <CountDisplay value={count} loading={loading} />
+                <CountDisplay value={totalCount} loading={loading} />
               </div>
               <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
                 <div
