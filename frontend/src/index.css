@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply antialiased text-slate-900 dark:text-slate-100;
+}
+
+@layer utilities {
+  .scroll-panel {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(148 163 184 / 0.6) transparent;
+  }
+
+  .dark .scroll-panel {
+    scrollbar-color: rgb(100 116 139 / 0.7) transparent;
+  }
+
+  .scroll-panel::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scroll-panel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scroll-panel::-webkit-scrollbar-thumb {
+    background-color: rgb(148 163 184 / 0.5);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .scroll-panel::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(100 116 139 / 0.8);
+  }
+
+  .dark .scroll-panel::-webkit-scrollbar-thumb {
+    background-color: rgb(100 116 139 / 0.6);
+  }
+
+  /* Subtle fade hint at top/bottom while scrolling */
+  .scroll-panel-fade {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 10px,
+      #000 calc(100% - 10px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 10px,
+      #000 calc(100% - 10px),
+      transparent 100%
+    );
+  }
+}

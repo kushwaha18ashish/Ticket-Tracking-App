@@ -1,0 +1,14 @@
+{
+  "name": "ticket-tracking-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n frontend,backend -c cyan,magenta \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\"",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "start:backend": "npm --prefix backend start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

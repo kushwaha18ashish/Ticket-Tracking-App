@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Environment {
+  THOR
+  QA
+  RELEASE
+  PRODUCTION
+}
+
+enum TicketStatusValue {
+  IN_PROGRESS
+  PASS
+  FAIL
+  BLOCKED
+}
+
+enum OverallStatus {
+  IN_PROGRESS
+  PASS
+  FAIL
+  BLOCKED
+}
+
+enum ActivityAction {
+  CREATED
+  STATUS_CHANGE
+  PROMOTION
+  COMMENT
+  UPDATED
+  ISSUE_LOGGED
+  ISSUE_UPDATED
+  ISSUE_REMOVED
+}
+
+enum IssueStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  tickets      Ticket[]
+  comments     Comment[]
+  activityLogs ActivityLog[]
+  ticketIssues TicketIssue[]
+}
+
+model Ticket {
+  id                String            @id @default(uuid())
+  ticketId          String
+  title             String
+  basecampLink      String?
+  notes             String?
+  currentEnvironment Environment      @default(THOR)
+  overallStatus     OverallStatus     @default(IN_PROGRESS)
+  createdById       String
+  createdBy         User              @relation(fields: [createdById], references: [id])
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  statuses          TicketStatus[]
+  comments          Comment[]
+  activityLogs      ActivityLog[]
+  issues            TicketIssue[]
+
+  @@unique([createdById, ticketId])
+}
+
+model TicketIssue {
+  id         String      @id @default(uuid())
+  ticketId   String
+  ticket     Ticket      @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User        @relation(fields: [userId], references: [id])
+  title      String
+  githubUrl  String
+  notes      String?
+  status     IssueStatus @default(OPEN)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model TicketStatus {
+  id          String            @id @default(uuid())
+  ticketId    String
+  ticket      Ticket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  environment Environment
+  status      TicketStatusValue @default(IN_PROGRESS)
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([ticketId, environment])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id              String            @id @default(uuid())
+  ticketId        String
+  ticket          Ticket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User              @relation(fields: [userId], references: [id])
+  action          ActivityAction
+  environment     Environment?
+  previousStatus  TicketStatusValue?
+  newStatus       TicketStatusValue?
+  fromEnvironment Environment?
+  toEnvironment   Environment?
+  message         String?
+  createdAt       DateTime          @default(now())
+}
