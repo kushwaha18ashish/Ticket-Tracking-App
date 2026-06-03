@@ -1,5 +1,5 @@
 import type { TicketFilters as Filters } from '@/types';
-import { ENVIRONMENT_LABELS, ENVIRONMENTS, STATUS_LABELS, STATUS_OPTIONS } from '@/lib/constants';
+import { ENVIRONMENT_LABELS, ENVIRONMENTS, STATUS_LABELS, FILTER_STATUS_OPTIONS } from '@/lib/constants';
 import { Button } from '@/components/ui/Button';
 
 interface TicketFiltersProps {
@@ -78,7 +78,7 @@ export function TicketFiltersBar({
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-900 dark:text-white"
           >
             <option value="">All</option>
-            {STATUS_OPTIONS.map((s) => (
+            {FILTER_STATUS_OPTIONS.map((s) => (
               <option key={s} value={s}>
                 {STATUS_LABELS[s]}
               </option>

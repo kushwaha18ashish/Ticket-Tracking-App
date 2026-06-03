@@ -10,6 +10,7 @@ const styles: Record<StatusType, string> = {
     'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
   IN_PROGRESS:
     'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
+  TBD: 'bg-slate-100 text-slate-500 dark:bg-slate-800/40 dark:text-slate-400 border border-slate-200 dark:border-slate-700/50',
 };
 
 interface StatusBadgeProps {

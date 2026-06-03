@@ -1,5 +1,5 @@
 export type Environment = 'THOR' | 'QA' | 'RELEASE' | 'PRODUCTION';
-export type TicketStatusValue = 'IN_PROGRESS' | 'PASS' | 'FAIL' | 'BLOCKED';
+export type TicketStatusValue = 'IN_PROGRESS' | 'PASS' | 'FAIL' | 'BLOCKED' | 'TBD';
 export type OverallStatus = 'IN_PROGRESS' | 'PASS' | 'FAIL' | 'BLOCKED';
 export type ActivityAction =
   | 'CREATED'
