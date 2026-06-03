@@ -14,6 +14,7 @@ export const STATUS_LABELS: Record<TicketStatusValue, string> = {
   PASS: 'Pass',
   FAIL: 'Fail',
   BLOCKED: 'Blocked',
+  TBD: 'TBD',
 };
 
 export const PROMOTE_LABELS: Partial<Record<Environment, string>> = {
@@ -27,4 +28,12 @@ export const STATUS_OPTIONS: TicketStatusValue[] = [
   'PASS',
   'FAIL',
   'BLOCKED',
+];
+
+export const FILTER_STATUS_OPTIONS: (TicketStatusValue | 'TBD')[] = [
+  'IN_PROGRESS',
+  'PASS',
+  'FAIL',
+  'BLOCKED',
+  'TBD',
 ];

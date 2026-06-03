@@ -7,6 +7,7 @@ import {
 import { z } from 'zod';
 import * as ticketService from '../services/ticket.service';
 import { canPromote } from '../services/ticket.service';
+import { ENVIRONMENT_ORDER } from '../utils/overallStatus';
 
 const createTicketSchema = z.object({
   ticketId: z.string().min(1),
@@ -235,9 +236,15 @@ export async function deleteTicket(
 }
 
 export function serializeTicket(ticket: ticketService.TicketWithRelations) {
+  const currentEnvIndex = ENVIRONMENT_ORDER.indexOf(ticket.currentEnvironment);
+
   const statusMap = Object.fromEntries(
-    ticket.statuses.map((s) => [s.environment, s.status])
-  ) as Record<Environment, TicketStatusValue>;
+    ticket.statuses.map((s) => {
+      const envIndex = ENVIRONMENT_ORDER.indexOf(s.environment);
+      const status = envIndex > currentEnvIndex ? 'TBD' : s.status;
+      return [s.environment, status];
+    })
+  ) as Record<Environment, TicketStatusValue | 'TBD'>;
 
   return {
     id: ticket.id,

@@ -36,7 +36,7 @@ export type TicketWithRelations = Prisma.TicketGetPayload<{
 
 export interface TicketFilters {
   environment?: Environment;
-  status?: TicketStatusValue;
+  status?: TicketStatusValue | 'TBD';
   overallStatus?: OverallStatus;
   ticketId?: string;
   search?: string;
@@ -166,14 +166,24 @@ export async function getTickets(
   }
 
   if (filters.status && filters.environment) {
-    where.statuses = {
-      some: {
-        environment: filters.environment,
-        status: filters.status,
-      },
-    };
+    if (filters.status === 'TBD') {
+      const envIndex = ENVIRONMENT_ORDER.indexOf(filters.environment);
+      const lowerEnvs = ENVIRONMENT_ORDER.slice(0, envIndex);
+      where.currentEnvironment = { in: lowerEnvs };
+    } else {
+      where.statuses = {
+        some: {
+          environment: filters.environment,
+          status: filters.status,
+        },
+      };
+    }
   } else if (filters.status) {
-    where.statuses = { some: { status: filters.status } };
+    if (filters.status === 'TBD') {
+      where.currentEnvironment = { not: Environment.PRODUCTION };
+    } else {
+      where.statuses = { some: { status: filters.status } };
+    }
   }
 
   if (filters.search) {
@@ -241,8 +251,13 @@ export async function getTicketStats(userId: string): Promise<TicketStats> {
         stats.inProgress++;
     }
 
+    const currentEnvIdx = ENVIRONMENT_ORDER.indexOf(ticket.currentEnvironment);
     for (const s of ticket.statuses) {
       const bucket = stats.byEnvironment[s.environment];
+      const envIdx = ENVIRONMENT_ORDER.indexOf(s.environment);
+      if (envIdx > currentEnvIdx) {
+        continue;
+      }
       switch (s.status) {
         case TicketStatusValue.PASS:
           bucket.pass++;
